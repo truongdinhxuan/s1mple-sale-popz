@@ -1,0 +1,27 @@
+{
+    order(id: "${orderId}") {
+      createdAt
+      shippingAddress {
+        city
+        country
+        firstName
+      }
+      lineItems(first: 1) {
+        edges {
+          node {
+            product {
+            id
+            title
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  }

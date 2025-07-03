@@ -1,0 +1,39 @@
+{
+  orders(first: 30, sortKey: CREATED_AT, reverse: true) {
+    nodes {
+      name
+      createdAt
+      shippingAddress {
+        firstName
+        lastName
+        address1
+        city
+        country
+      }
+      lineItems(first: 1) {
+        nodes {
+          product {
+            id
+            title
+            images(first: 1) {
+              nodes {
+                originalSrc
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
