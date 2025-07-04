@@ -1,5 +1,5 @@
 (function() {
-  const BASE_URL = 'https://dealtime-disco-broke-readings.trycloudflare.com/scripttag';
+  const BASE_URL = 'https://aud-ruling-assistance-murder.trycloudflare.com/scripttag';
 
   const scriptElement = document.createElement('script');
   scriptElement.type = 'text/javascript';
