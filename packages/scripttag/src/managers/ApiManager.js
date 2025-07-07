@@ -12,6 +12,7 @@ export default class ApiManager {
       `https://${BASE_URL}/clientApi/notifications?shopDomain=${shopifyDomain}`,
       'get'
     );
+    // console.log(notifications, settings);
     return {notifications, settings};
   };
 }

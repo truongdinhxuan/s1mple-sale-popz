@@ -6,14 +6,12 @@ import {DEFAULT_SETTING} from '@functions/const/setting';
 import {createSettings} from '@functions/repositories/settingsRepository';
 
 /**
- * Get orders from Shopify
- * @param {import('koa').Context} ctx
+ * Get limit 30 orders from Shopify
+ * @param shopData
  */
-export async function getOrdersByLimit(ctx) {
+export async function getOrdersByLimit(shopData) {
   try {
-    const shopDomain = ctx.state.shopify.shop;
-    const shop = await getShopByShopifyDomain(shopDomain);
-    const shopify = await initShopify(shop);
+    const shopify = await initShopify(shopData);
     const shopQuery = loadGraphQL('/order.graphql');
     const shopGraphql = await shopify.graphql(shopQuery);
     await Promise.all(
@@ -27,11 +25,12 @@ export async function getOrdersByLimit(ctx) {
           productId: product?.id || '',
           productImage: product?.images?.nodes[0]?.originalSrc || '',
           timestamp: order.createdAt,
-          shopId: shop.id,
-          shopDomain: shop.shopifyDomain
+          shopId: shopData.id,
+          shopDomain: shopData.shopifyDomain
         });
       })
     );
+    console.log('✅ 30 Orders created');
     // console.dir(shopGraphql.orders.nodes, {depth: null});
     return shopGraphql.orders.nodes;
   } catch (e) {
@@ -39,14 +38,20 @@ export async function getOrdersByLimit(ctx) {
   }
 }
 
-export async function createDefaultSetting(ctx) {
+/*
+ *
+ * @param shopDomain
+ * @param shopData
+ */
+export async function createDefaultSetting(shopDomain, shopData) {
   try {
-    const shopDomain = ctx.state.shopify.shop;
-    const shop = await getShopByShopifyDomain(shopDomain);
-    await createSettings(shop.id, {
+    // const shopDomain = ctx.state.shopify.shop;
+    // const shop = await getShopByShopifyDomain(shopDomain);
+    await createSettings(shopData.id, {
       shopDomain: shopDomain,
       ...DEFAULT_SETTING
     });
+    console.log('✅ Default setting created successfully');
   } catch (e) {
     console.error(e);
   }

@@ -45,43 +45,27 @@ export async function syncWebhooks(shopData) {
   }
 }
 
-/*
- * Register new scripttag
- */
-export async function createScripttag(shopData) {
-  const client = initShopify(shopData);
-  const scripttag = await client.scriptTag.create({
-    event: 'onload',
-    src: `https://${appConfig.baseUrl}/scripttag/avada-sale-pop.min.js`
-  });
-  console.log(scripttag);
-}
-
 /**
- * Listen to new order
+ * Listen to new order (when User create new order, this will listen new order)
  *
  * @param {Object} ctx
+ * @return {Promise<void>}
  */
 export async function listenNewOrder(ctx) {
   try {
     const shopifyDomain = ctx.get('X-Shopify-Shop-Domain');
     const orderData = ctx.req.body;
     const orderId = ctx.req.body.admin_graphql_api_id;
-    const {id, accessToken} = await getShopByShopifyDomain(shopifyDomain, shopify.accessTokenKey);
-    console.log(accessToken);
-    const shop = new Shopify({
-      shopName: shopifyDomain,
-      accessToken: accessToken
-    });
-    const noti = await getNotification(shop, orderId, orderData);
-    await createNotification({...noti, shopDomain: shopifyDomain, shopId: id});
-    return (ctx.body = {
-      success: true
-    });
+    const shopData = await getShopByShopifyDomain(shopifyDomain, shopify.accessTokenKey);
+    const shop = initShopify(shopData);
+
+    const notification = await getNotification(shop, orderId, orderData);
+    await createNotification({...notification, shopDomain: shopifyDomain, shopId: shopData.id});
+    ctx.body = {success: true};
   } catch (e) {
-    console.log(e);
-    return (ctx.body = {success: false});
+    console.error('Error in listenNewOrder:', e);
+    ctx.body = {success: false};
   }
 }
 
-module.exports = {listenNewOrder, syncWebhooks, createScripttag};
+module.exports = {listenNewOrder, syncWebhooks};

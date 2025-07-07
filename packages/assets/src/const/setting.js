@@ -2,19 +2,6 @@ export const options = [
   {label: 'All pages', value: 'all-page'},
   {label: 'Specific page', value: 'specific-page'}
 ];
-export const tabs = [
-  {
-    id: 'display',
-    content: 'Display',
-    accessibilityLabel: 'Display setting',
-    panelID: 'displayPanel'
-  },
-  {
-    id: 'triggers',
-    content: 'Triggers',
-    panelID: 'triggers-panel'
-  }
-];
 export const defaultSettings = {
   position: 'bottom-left',
   hideTimeAgo: true,

@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {tabs} from '../../const/setting';
+// import {tabs} from '../../const/setting';
 import {
   Button,
   Card,
@@ -38,7 +38,21 @@ export default function Settings() {
       [key]: value
     }));
   }, []);
-
+  const tabs = [
+    {
+      id: 'display',
+      content: 'Display',
+      accessibilityLabel: 'Display setting',
+      panelID: 'displayPanel',
+      body: <Display handleChange={handleChange} settings={settings} />
+    },
+    {
+      id: 'triggers',
+      content: 'Triggers',
+      panelID: 'triggers-panel',
+      body: <Triggers handleChange={handleChange} settings={settings} />
+    }
+  ];
   const saveData = async () => {
     await handleEdit(settings);
   };
@@ -83,16 +97,7 @@ export default function Settings() {
         <Layout.Section>
           <LegacyCard>
             <LegacyTabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
-              {selected === 0 && (
-                <Display
-                  // data={data}
-                  handleEdit={handleEdit}
-                  defaultSettings={defaultSettings}
-                  handleChange={handleChange}
-                  settings={settings}
-                />
-              )}
-              {selected === 1 && <Triggers handleChange={handleChange} settings={settings} />}
+              {tabs[selected].body}
             </LegacyTabs>
           </LegacyCard>
         </Layout.Section>

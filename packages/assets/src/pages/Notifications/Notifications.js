@@ -3,7 +3,6 @@ import {
   Page,
   InlineStack,
   ResourceList,
-  Card,
   ResourceItem,
   Box,
   Text,
@@ -12,7 +11,7 @@ import {
   SkeletonBodyText,
   SkeletonDisplayText
 } from '@shopify/polaris';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useState, useMemo} from 'react';
 import NotificationPopup from '../../components/NotificationPopup/NotificationPopup';
 import useFetchApi from '../../hooks/api/useFetchApi';
 import {formatDateOnly} from '../../helpers/utils/formatFullTime';
@@ -30,10 +29,24 @@ dayjs.extend(relativeTime);
 const Notifications = () => {
   const {data, loading} = useFetchApi({url: '/notifications'});
   const [selectedItems, setSelectedItems] = useState([]);
+  const [sortValue, setSortValue] = useState('NEWEST_UPDATE');
 
   const handleSelectionChange = useCallback(selected => {
     setSelectedItems(selected);
   }, []);
+
+  const sortedItems = useMemo(() => {
+    if (!data) return [];
+    const items = [...data];
+    if (sortValue === 'NEWEST_UPDATE') {
+      return items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+    if (sortValue === 'OLDEST_UPDATE') {
+      return items.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    }
+    return items;
+  }, [data, sortValue]);
+
   /*
    * Render item
    * @param item
@@ -90,11 +103,19 @@ const Notifications = () => {
       <LegacyCard>
         <ResourceList
           resourceName={{singular: 'notification', plural: 'notifications'}}
-          items={data}
+          items={sortedItems}
           renderItem={renderItem}
           selectedItems={selectedItems}
           onSelectionChange={handleSelectionChange}
           selectable
+          sortValue={sortValue}
+          sortOptions={[
+            {label: 'Newest update', value: 'NEWEST_UPDATE'},
+            {label: 'Oldest update', value: 'OLDEST_UPDATE'}
+          ]}
+          onSortChange={selected => {
+            setSortValue(selected);
+          }}
         />
       </LegacyCard>
     </Page>

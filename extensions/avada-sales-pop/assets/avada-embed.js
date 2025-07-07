@@ -1,5 +1,5 @@
 (function() {
-  const BASE_URL = 'https://board-corporations-standing-summaries.trycloudflare.com/scripttag';
+  const BASE_URL = 'https://fly-beef-tablet-links.trycloudflare.com/scripttag';
 
   const scriptElement = document.createElement('script');
   scriptElement.type = 'text/javascript';

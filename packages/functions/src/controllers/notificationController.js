@@ -1,6 +1,7 @@
 import {
   getNotifications,
-  createNotification
+  createNotification,
+  getNotificationsSortedByDate
 } from '@functions/repositories/notificationsRepository';
 
 async function getNotificationsList(ctx) {
@@ -10,4 +11,12 @@ async function getNotificationsList(ctx) {
     success: true
   });
 }
-module.exports = {getNotificationsList, createNotification};
+
+async function getNotificationOrderBy(ctx) {
+  const data = await getNotificationsSortedByDate();
+  return (ctx.body = {
+    data: data
+  });
+}
+
+module.exports = {getNotificationsList, createNotification, getNotificationOrderBy};

@@ -40,12 +40,12 @@ async function createSettings(shopId, data) {
   if (!snapshot.empty) {
     console.log(`Settings already exist for shopId: ${shopId}`);
     return;
-  } else {
-    return await collection.add({
-      ...data,
-      shopId: shopId
-    });
   }
+
+  return await collection.add({
+    ...data,
+    shopId: shopId
+  });
 }
 
 async function updateSettings(shopID, data) {

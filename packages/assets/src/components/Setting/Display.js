@@ -19,7 +19,7 @@ import {displaySettings} from '../../const/setting';
  * @returns {JSX.Element}
  */
 /* eslint-disable react/prop-types */
-const Display = ({handleChange, handleEdit, settings}) => {
+const Display = ({handleChange, settings}) => {
   // console.log(data);
   const {renderBox} = useRenderBox(settings.position);
 

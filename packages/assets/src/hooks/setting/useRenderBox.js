@@ -21,8 +21,8 @@ export const useRenderBox = (currentPosition = 'bottom-left') => {
           }
         }}
         style={{
-          width: '60px',
-          height: '40px',
+          width: '110px',
+          height: '60px',
           background: '#f4f6f8',
           borderRadius: '6px',
           border: `2px solid ${borderColor}`,
@@ -33,8 +33,8 @@ export const useRenderBox = (currentPosition = 'bottom-left') => {
       >
         <div
           style={{
-            width: '24px',
-            height: '16px',
+            width: '40px',
+            height: '25px',
             background: blockColor,
             position: 'absolute',
             ...style

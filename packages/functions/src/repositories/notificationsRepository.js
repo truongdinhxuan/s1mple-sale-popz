@@ -25,4 +25,14 @@ async function createNotification(data) {
   return created.id;
 }
 
-module.exports = {getNotifications, getNotificationsByShopDomain, createNotification};
+async function getNotificationsSortedByDate(order = 'desc') {
+  const snapshot = await collection.orderBy('createdAt', order).get();
+  return snapshot.docs.map(doc => ({id: doc.id, ...formatDateFields(doc.data())}));
+}
+
+module.exports = {
+  getNotifications,
+  getNotificationsByShopDomain,
+  createNotification,
+  getNotificationsSortedByDate
+};
