@@ -15,33 +15,40 @@ const WEBHOOK_TOPICS = ['orders/create'];
  * @return {Promise<void>}
  */
 export async function syncWebhooks(shopData) {
-  const client = initShopify(shopData);
-  const existingWebhooks = await client.webhook.list();
+  try {
+    // const webhookId = ctx.request.headers['x-shopify-webhook-id'];
+    // console.log('Received webhook', webhookId);
+    const client = initShopify(shopData);
+    const existingWebhooks = await client.webhook.list();
 
-  for (const topic of WEBHOOK_TOPICS) {
-    const existing = existingWebhooks.find(w => w.topic === topic);
-    const expectedAddress = `https://${appConfig.baseUrl}/webhook/${topic}`;
+    for (const topic of WEBHOOK_TOPICS) {
+      const existing = existingWebhooks.find(w => w.topic === topic);
+      const expectedAddress = `https://${appConfig.baseUrl}/webhook/${topic}`;
 
-    if (!existing) {
-      await client.webhook.create({
-        topic,
-        address: expectedAddress,
-        format: 'json'
-      });
-      console.log('Created webhook', topic);
-    } else if (existing.address !== expectedAddress) {
-      await client.webhook.delete(existing.id);
-      console.log('Deleted old webhook with address:', existing.address);
+      if (!existing) {
+        await client.webhook.create({
+          topic,
+          address: expectedAddress,
+          format: 'json'
+        });
+        console.log('Created webhook', topic);
+      } else if (existing.address !== expectedAddress) {
+        await client.webhook.delete(existing.id);
+        console.log('Deleted old webhook with address:', existing.address);
 
-      await client.webhook.create({
-        topic,
-        address: expectedAddress,
-        format: 'json'
-      });
-      console.log('Re-created webhook with correct address', topic);
-    } else {
-      console.log('Webhook already correct for topic:', topic);
+        await client.webhook.create({
+          topic,
+          address: expectedAddress,
+          format: 'json'
+        });
+        console.log('Re-created webhook with correct address', topic);
+      } else {
+        console.log('Webhook already correct for topic:', topic);
+      }
     }
+  } catch (e) {
+    console.error('Error syncing webhooks:', e);
+    ctx.body = {success: false};
   }
 }
 

@@ -50,10 +50,13 @@ export default class DisplayManager {
     const {includedUrls, excludedUrls} = this.settings;
     const currentHref = window.location.href; // e.g., https://shop.com/products/1
     const currentPath = window.location.pathname; // e.g., /products/1
+    console.log('includedURL: ', includedUrls);
+    console.log('excludedURL: ', excludedUrls);
 
     const includedPatterns = this._parseUrlPatterns(includedUrls);
     const excludedPatterns = this._parseUrlPatterns(excludedUrls);
-
+    console.log('includedPatterns: ', includedPatterns);
+    console.log('excludedPatterns: ', excludedPatterns);
     const isExcluded = excludedPatterns.some(
       pattern => this._isMatch(currentHref, pattern) || this._isMatch(currentPath, pattern)
     );

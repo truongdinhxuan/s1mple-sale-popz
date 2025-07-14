@@ -1,6 +1,8 @@
-import {prepareShopData} from '@avada/core';
-import shopifyConfig from '../config/shopify';
+import {getShopByShopifyDomain, prepareShopData} from '@avada/core';
+import shopifyConfig from '@functions/config/shopify';
 import Shopify from 'shopify-api-node';
+import {createDefaultSetting, getOrdersByLimit} from '@functions/services/afterInstall';
+import {syncWebhooks} from '@functions/controllers/webHookController';
 
 export const API_VERSION = '2024-04';
 
@@ -21,4 +23,42 @@ export function initShopify(shopData, apiVersion = API_VERSION) {
     apiVersion,
     autoLimit: true
   });
+}
+
+/**
+ * Handles logic after an app is installed.
+ * It syncs webhooks, fetches initial orders, and creates default settings.
+ *
+ * @param {Object} ctx - The Koa context from the auth middleware.
+ */
+export async function handleAfterInstall(ctx) {
+  const shopDomain = ctx.state.shopify.shop;
+  const shopData = await getShopByShopifyDomain(shopDomain);
+  try {
+    await Promise.all([
+      syncWebhooks(shopData),
+      getOrdersByLimit(shopData),
+      createDefaultSetting(shopDomain, shopData)
+    ]);
+  } catch (e) {
+    console.error(`[handleAfterInstall] Error for shop ${shopDomain}:`, e);
+  }
+}
+
+/**
+ * Handles logic after a user logs in.
+ * It syncs webhooks to ensure they are up-to-date.
+ *
+ * @param {Object} ctx - The Koa context from the auth middleware.
+ */
+export async function handleAfterLogin(ctx) {
+  try {
+    const shopDomain = ctx.state.shopify.shop;
+    const shopData = await getShopByShopifyDomain(shopDomain);
+    // Sync webhooks after Login
+    await syncWebhooks(shopData);
+    // await getOrdersByLimit(shopData);
+  } catch (e) {
+    console.error(`[handleAfterLogin] Error for shop ${shopDomain}:`, e);
+  }
 }

@@ -23,13 +23,13 @@ async function getSettings(shopID) {
   };
 }
 
-const getSettingsByShopDomain = async shopDomain => {
+async function getSettingsByShopDomain(shopDomain) {
   const settings = await collection.where('shopDomain', '==', shopDomain).get();
   if (!settings.empty) {
     return settings.docs[0].data();
   }
   return null;
-};
+}
 
 async function createSettings(shopId, data) {
   const snapshot = await collection

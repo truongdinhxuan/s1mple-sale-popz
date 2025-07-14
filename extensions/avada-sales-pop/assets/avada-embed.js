@@ -1,5 +1,5 @@
 (function() {
-  const BASE_URL = 'https://fly-beef-tablet-links.trycloudflare.com/scripttag';
+  const BASE_URL = 'https://cap-school-interactions-lake.trycloudflare.com/scripttag';
 
   const scriptElement = document.createElement('script');
   scriptElement.type = 'text/javascript';

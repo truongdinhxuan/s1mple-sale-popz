@@ -1,4 +1,5 @@
 // Notifications.jsx
+
 import {
   Page,
   InlineStack,
@@ -6,57 +7,29 @@ import {
   ResourceItem,
   Box,
   Text,
-  LegacyCard,
-  SkeletonPage,
-  SkeletonBodyText,
-  SkeletonDisplayText
+  LegacyCard
 } from '@shopify/polaris';
-import React, {useCallback, useState, useMemo} from 'react';
+import React, {useState, useCallback, useMemo} from 'react';
 import NotificationPopup from '../../components/NotificationPopup/NotificationPopup';
 import useFetchApi from '../../hooks/api/useFetchApi';
 import {formatDateOnly} from '../../helpers/utils/formatFullTime';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-
-dayjs.extend(relativeTime);
-
-/**
- * Notifications component
- * @returns {React.ReactElement}
- * @constructor
- */
+import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
+import formatRelativeTime from '@functions/helpers/datetime/formatRelativeTime';
 
 const Notifications = () => {
-  const {data, loading} = useFetchApi({url: '/notifications'});
+  const [sortValue, setSortValue] = useState('desc');
   const [selectedItems, setSelectedItems] = useState([]);
-  const [sortValue, setSortValue] = useState('NEWEST_UPDATE');
+  const apiUrl = useMemo(() => `/notifications?sortBy=${sortValue}`, [sortValue]);
+
+  const {data: items, loading} = useFetchApi({url: apiUrl});
 
   const handleSelectionChange = useCallback(selected => {
     setSelectedItems(selected);
   }, []);
-
-  const sortedItems = useMemo(() => {
-    if (!data) return [];
-    const items = [...data];
-    if (sortValue === 'NEWEST_UPDATE') {
-      return items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    }
-    if (sortValue === 'OLDEST_UPDATE') {
-      return items.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-    }
-    return items;
-  }, [data, sortValue]);
-
-  /*
-   * Render item
-   * @param item
-   * @returns {JSX.Element}
-   */
   const renderItem = item => {
+    if (!item) return null;
     const time = formatDateOnly(item.timestamp);
-    const timeAgo = dayjs(item.timestamp).fromNow();
-
-    // moment
+    // console.log(item.timestamp)
     return (
       <InlineStack align="space-between" blockAlign="center">
         <Box>
@@ -68,11 +41,11 @@ const Notifications = () => {
                 city={item.city}
                 country={item.country}
                 productName={item.productName}
-                timestamp={timeAgo}
+                timestamp={formatRelativeTime(item.timestamp)}
                 productImage={item.productImage}
               />
             }
-            accessibilityLabel={`View details for ${item}`}
+            accessibilityLabel={`View details for ${item.productName}`}
           />
         </Box>
         <Box paddingInlineEnd="400">
@@ -85,33 +58,23 @@ const Notifications = () => {
   };
 
   if (loading) {
-    return (
-      <SkeletonPage title="Notifications">
-        <SkeletonDisplayText size="medium" />
-        <br />
-        <SkeletonBodyText lines={6} />
-      </SkeletonPage>
-    );
+    return <LoadingSkeleton title="Notifications" hasSidebar={false} mainLines={6} />;
   }
-  /*
-   * Render component
-   * @returns {JSX.Element}
-   * @constructor
-   */
+
   return (
     <Page title="Notifications" subtitle="List of sales notification from Shopify">
       <LegacyCard>
         <ResourceList
+          items={items || []}
           resourceName={{singular: 'notification', plural: 'notifications'}}
-          items={sortedItems}
           renderItem={renderItem}
           selectedItems={selectedItems}
           onSelectionChange={handleSelectionChange}
           selectable
           sortValue={sortValue}
           sortOptions={[
-            {label: 'Newest update', value: 'NEWEST_UPDATE'},
-            {label: 'Oldest update', value: 'OLDEST_UPDATE'}
+            {label: 'Newest update', value: 'desc'}, // NEWEST -> descending
+            {label: 'Oldest update', value: 'asc'} // OLDEST -> ascending
           ]}
           onSortChange={selected => {
             setSortValue(selected);

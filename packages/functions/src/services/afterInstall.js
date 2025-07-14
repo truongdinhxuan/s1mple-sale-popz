@@ -4,6 +4,7 @@ import {loadGraphQL} from '@functions/helpers/graphql/graphqlHelpers';
 import {createNotification} from '@functions/repositories/notificationsRepository';
 import {DEFAULT_SETTING} from '@functions/const/setting';
 import {createSettings} from '@functions/repositories/settingsRepository';
+import {extractNumericId} from '@functions/helpers/order/order';
 
 /**
  * Get limit 30 orders from Shopify
@@ -22,9 +23,9 @@ export async function getOrdersByLimit(shopData) {
           city: order.shippingAddress?.city || '',
           country: order.shippingAddress?.country || '',
           productName: product?.title || '',
-          productId: product?.id || '',
+          productId: extractNumericId(product?.id) || '',
           productImage: product?.images?.nodes[0]?.originalSrc || '',
-          timestamp: order.createdAt,
+          timestamp: new Date(order.createdAt),
           shopId: shopData.id,
           shopDomain: shopData.shopifyDomain
         });

@@ -5,34 +5,36 @@ const firestore = new Firestore();
 /** @type CollectionReference */
 const collection = firestore.collection('notifications');
 
-async function getNotifications() {
-  const noti = await collection.get();
-  return noti.docs.map(doc => ({id: doc.id, ...formatDateFields(doc.data())}));
-}
-
-const getNotificationsByShopDomain = async shopDomain => {
-  const notifications = await collection.where('shopDomain', '==', shopDomain).get();
-  if (notifications.empty) {
+async function getNotifications({shopDomain, shopId, sortBy}) {
+  let query = collection;
+  console.log({shopDomain, shopId, sortBy});
+  if (shopDomain) {
+    query = query.where('shopDomain', '==', shopDomain);
+  } else if (shopId) {
+    query = query.where('shopId', '==', shopId);
+  }
+  if (sortBy) {
+    const orderDirection = sortBy.toLowerCase() === 'asc' ? 'asc' : 'desc';
+    query = query.orderBy('timestamp', orderDirection);
+  }
+  // console.log('query : ', sortBy);
+  const snapshot = await query.get();
+  if (snapshot.empty) {
     return [];
   }
-  return notifications.docs.map(notification => {
-    return {...notification.data(), id: notification.id};
+  return snapshot.docs.map(doc => {
+    const data = {id: doc.id, ...formatDateFields(doc.data())};
+    console.log(data);
+    return data;
   });
-};
+}
 
 async function createNotification(data) {
   const created = await collection.add({...data});
   return created.id;
 }
 
-async function getNotificationsSortedByDate(order = 'desc') {
-  const snapshot = await collection.orderBy('createdAt', order).get();
-  return snapshot.docs.map(doc => ({id: doc.id, ...formatDateFields(doc.data())}));
-}
-
 module.exports = {
   getNotifications,
-  getNotificationsByShopDomain,
-  createNotification,
-  getNotificationsSortedByDate
+  createNotification
 };

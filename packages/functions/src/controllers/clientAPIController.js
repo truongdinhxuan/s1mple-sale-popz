@@ -1,13 +1,16 @@
-import {getNotificationsByShopDomain} from '@functions/repositories/notificationsRepository';
+import {getNotifications} from '@functions/repositories/notificationsRepository';
 import {getSettingsByShopDomain} from '@functions/repositories/settingsRepository';
 import moment from 'moment';
 
+/*
+for scriptag
+ */
 export async function getNotificationsAndSettings(ctx) {
   try {
     const {shopDomain} = ctx.query;
     console.log(shopDomain);
     const [notifications, settings] = await Promise.all([
-      getNotificationsByShopDomain(shopDomain),
+      getNotifications({shopDomain}),
       getSettingsByShopDomain(shopDomain)
     ]);
     return (ctx.body = {

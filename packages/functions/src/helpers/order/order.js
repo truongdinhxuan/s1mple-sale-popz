@@ -14,3 +14,6 @@ export function simplyOrderResponse(orders) {
     }))
   }));
 }
+export function extractNumericId(gid) {
+  return gid?.split('/')?.pop() || '';
+}

@@ -1,4 +1,4 @@
-import {BlockStack, Select, TextField, Text, LegacyCard} from '@shopify/polaris';
+import {BlockStack, Select, TextField, Text, LegacyCard, Box} from '@shopify/polaris';
 import React, {useState, useCallback, useEffect} from 'react';
 import {options} from '../../const/setting';
 
@@ -80,28 +80,34 @@ const Triggers = ({handleChange, settings}) => {
 
   return (
     <LegacyCard.Section>
-      <BlockStack>
-        <Select
-          label={
-            <Text as="span" fontWeight="bold">
-              PAGE RESTRICTION
-            </Text>
-          }
-          options={options}
-          onChange={handleSelectChange}
-          value={selected}
-        />
-        {selected === 'specific-page' ? (
-          <>
-            <TextField
-              label="Included page"
-              value={includedValue}
-              onChange={handleIncludedChange}
-              autoComplete="off"
-              multiline={5}
-              helpText="Page URLs to show the pop-up (separated by new lines)"
-              error={includedError}
-            />
+      <Box as="div" width="290" minHeight="760">
+        <BlockStack gap="500">
+          <Text variant="headingXs" as="span" fontWeight="bold">
+            PAGE RESTRICTION
+          </Text>
+          <Select options={options} onChange={handleSelectChange} value={selected} />
+          {selected === 'specific-page' ? (
+            <>
+              <TextField
+                label="Included page"
+                value={includedValue}
+                onChange={handleIncludedChange}
+                autoComplete="off"
+                multiline={5}
+                helpText="Page URLs to show the pop-up (separated by new lines)"
+                error={includedError}
+              />
+              <TextField
+                label="Excluded pages"
+                value={excludedValue}
+                onChange={handleExcludedChange}
+                autoComplete="off"
+                multiline={5}
+                helpText="Page URLs NOT to show the pop-up (separated by new lines)"
+                error={excludedError}
+              />
+            </>
+          ) : (
             <TextField
               label="Excluded pages"
               value={excludedValue}
@@ -111,19 +117,9 @@ const Triggers = ({handleChange, settings}) => {
               helpText="Page URLs NOT to show the pop-up (separated by new lines)"
               error={excludedError}
             />
-          </>
-        ) : (
-          <TextField
-            label="Excluded pages"
-            value={excludedValue}
-            onChange={handleExcludedChange}
-            autoComplete="off"
-            multiline={5}
-            helpText="Page URLs NOT to show the pop-up (separated by new lines)"
-            error={excludedError}
-          />
-        )}
-      </BlockStack>
+          )}
+        </BlockStack>
+      </Box>
     </LegacyCard.Section>
   );
 };

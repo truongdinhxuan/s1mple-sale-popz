@@ -8,8 +8,7 @@ import createErrorHandler from '@functions/middleware/errorHandler';
 import firebase from 'firebase-admin';
 import appConfig from '@functions/config/app';
 import shopifyOptionalScopes from '@functions/config/shopifyOptionalScopes';
-import {createDefaultSetting, getOrdersByLimit} from '@functions/services/afterInstall';
-import {syncWebhooks} from '@functions/controllers/webHookController';
+import {handleAfterInstall, handleAfterLogin} from '@functions/services/shopifyService';
 
 if (firebase.apps.length === 0) {
   firebase.initializeApp();
@@ -38,30 +37,8 @@ app.use(
     scopes: shopifyConfig.scopes,
     secret: shopifyConfig.secret,
     successRedirect: '/embed',
-    afterInstall: async ctx => {
-      const shopDomain = ctx.state.shopify.shop;
-      const shopData = await getShopByShopifyDomain(shopDomain);
-      try {
-        await Promise.all([
-          syncWebhooks(shopData),
-          getOrdersByLimit(shopData),
-          createDefaultSetting(shopDomain, shopData)
-        ]);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    afterLogin: async ctx => {
-      try {
-        const shopDomain = ctx.state.shopify.shop;
-        const shopData = await getShopByShopifyDomain(shopDomain);
-        // Sync webhooks after Login
-        await syncWebhooks(shopData);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-
+    afterInstall: handleAfterInstall,
+    afterLogin: handleAfterLogin,
     initialPlan: {
       id: 'free',
       name: 'Free',

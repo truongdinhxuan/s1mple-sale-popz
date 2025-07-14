@@ -57,16 +57,24 @@ export default function useFetchApi({
     }
   }
 
+  async function updateDataField(key, value) {
+    setData(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  }
+
   useEffect(() => {
-    if (initLoad && !fetched) {
+    if (initLoad) {
       fetchApi(url, initQueries).then(() => {});
     }
-  }, []);
+  }, [url]);
 
   return {
     fetchApi,
     data,
     setData,
+    updateDataField,
     pageInfo,
     count,
     setCount,

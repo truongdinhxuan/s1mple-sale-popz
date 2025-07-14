@@ -18,8 +18,9 @@ export async function getAllSettings(ctx) {
     });
   } catch (e) {
     console.error(e);
-    ctx.status = 500;
     ctx.body = {
+      data: {},
+      success: false,
       error: e.message
     };
   }

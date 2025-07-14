@@ -1,3 +1,5 @@
+import {extractNumericId} from '@functions/helpers/order/order';
+
 export async function getNotification(shop, orderId, orderData) {
   const query = `query {
     order(id: "${orderId}") {
@@ -30,12 +32,11 @@ export async function getNotification(shop, orderId, orderData) {
   const response = await shop.graphql(query);
   const order = response?.order;
   const product = order?.lineItems?.edges?.[0]?.node?.product;
-
   return {
     firstName: order?.shippingAddress?.firstName || '',
     city: order?.shippingAddress?.city || '',
     country: order?.shippingAddress?.country || '',
-    productId: product?.id || '',
+    productId: extractNumericId(product?.id) || '',
     productName: product?.title || '',
     productImage: product?.images?.edges?.[0]?.node?.url || '',
     timestamp: new Date(order?.createdAt || Date.now())

@@ -1,3 +1,9 @@
+/**
+ *
+ * @param dateStr
+ * @param format
+ * @returns {string|null}
+ */
 export default function formatDateTime(dateStr = new Date(), format = 'yyyy-mm-dd') {
   if (!dateStr) {
     return null;

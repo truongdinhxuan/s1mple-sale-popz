@@ -1,22 +1,28 @@
 import {
   getNotifications,
-  createNotification,
-  getNotificationsSortedByDate
+  createNotification
 } from '@functions/repositories/notificationsRepository';
 
-async function getNotificationsList(ctx) {
-  const data = await getNotifications();
-  return (ctx.body = {
-    data: data,
-    success: true
-  });
+export async function getNotificationsList(ctx) {
+  try {
+    // console.log('Request: ', ctx.req.query);
+    // console.log('Res: ', ctx.res);
+    const {shopId, sortBy} = ctx.query;
+    // console.log(ctx.query);
+    const data = await getNotifications({shopId, sortBy});
+
+    return (ctx.body = {
+      data: data,
+      success: true
+    });
+  } catch (e) {
+    console.error(e);
+    ctx.body = {
+      data: {},
+      success: false,
+      error: e.message
+    };
+  }
 }
 
-async function getNotificationOrderBy(ctx) {
-  const data = await getNotificationsSortedByDate();
-  return (ctx.body = {
-    data: data
-  });
-}
-
-module.exports = {getNotificationsList, createNotification, getNotificationOrderBy};
+module.exports = {getNotificationsList, createNotification};

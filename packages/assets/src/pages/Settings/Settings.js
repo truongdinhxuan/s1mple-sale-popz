@@ -17,64 +17,50 @@ import Triggers from '../../components/Setting/Triggers';
 import useFetchApi from '../../hooks/api/useFetchApi';
 import useEditApi from '../../hooks/api/useEditApi';
 import {defaultSettings} from '../../const/setting';
+import LoadingSkeleton from '../../components/LoadingSkeleton/LoadingSkeleton';
 
 /**
  * @return {JSX.Element}
  */
 export default function Settings() {
-  const {data, loading} = useFetchApi({url: '/settings', defaultSettings});
+  const {data, loading, updateDataField} = useFetchApi({url: '/settings', defaultSettings});
   const {handleEdit} = useEditApi({url: '/settings'});
   const [selected, setSelected] = useState(0);
   const handleTabChange = useCallback(selectedTabIndex => setSelected(selectedTabIndex), []);
-  const [settings, setSettings] = useState(defaultSettings);
+  // const [settings, setSettings] = useState(defaultSettings);
 
-  useEffect(() => {
-    if (data) setSettings(data);
-  }, [data]);
+  // useEffect(() => {
+  //   if (data) setSettings(data);
+  // }, [data]);
 
-  const handleChange = useCallback((key, value) => {
-    setSettings(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  }, []);
+  const handleChange = useCallback(
+    (key, value) => {
+      updateDataField(key, value);
+    },
+    [updateDataField]
+  );
   const tabs = [
     {
       id: 'display',
       content: 'Display',
       accessibilityLabel: 'Display setting',
       panelID: 'displayPanel',
-      body: <Display handleChange={handleChange} settings={settings} />
+      body: <Display handleChange={handleChange} settings={data} />
     },
     {
       id: 'triggers',
       content: 'Triggers',
       panelID: 'triggers-panel',
-      body: <Triggers handleChange={handleChange} settings={settings} />
+      body: <Triggers handleChange={handleChange} settings={data} />
     }
   ];
   const saveData = async () => {
-    await handleEdit(settings);
+    await handleEdit(data);
   };
 
   if (loading) {
     return (
-      <SkeletonPage primaryAction title="Settings">
-        <Layout>
-          <Layout.Section variant="oneThird">
-            <SkeletonDisplayText size="small" />
-            <br />
-            <SkeletonBodyText lines={3} />
-          </Layout.Section>
-          <Layout.Section>
-            <Card sectioned>
-              <SkeletonDisplayText size="medium" />
-              <br />
-              <SkeletonBodyText lines={6} />
-            </Card>
-          </Layout.Section>
-        </Layout>
-      </SkeletonPage>
+      <LoadingSkeleton title="Settings" hasSidebar sidebarLines={3} mainLines={6} primaryAction />
     );
   }
 
@@ -91,7 +77,7 @@ export default function Settings() {
       {/* Main */}
       <Layout>
         <Layout.Section variant="oneThird">
-          <NotificationPopup settings={settings} />
+          <NotificationPopup settings={data} />
         </Layout.Section>
         {/* Layout display */}
         <Layout.Section>
